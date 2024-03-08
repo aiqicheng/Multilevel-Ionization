@@ -25,7 +25,6 @@ csvwrite('t_axis.csv', taxis)  % time axis for the evolution
 csvwrite('Kr_reduce4ODE.csv',Kr_reduce4ODE) % ion evolution
 csvwrite('ne_reduce4ODE.csv',ne_reduce4ODE) % number of electrons evolution
 % csvwrite('t_axis.csv', taxis)  % time axis for the evolution (same as fullODE)
-
 function [Ion_all, ne_all, taxis] = ionAtLocation(zf,r, picture, peakIntensity)
 % obtain ionization states of krypton for prescribed locations.
 % Inputs:
@@ -152,7 +151,7 @@ end
 
 Ion_final = Ion;
 ne_final = ne;
-
+taxis = taxis*1e12;
 %% plot result
 
 if picture == 1
@@ -163,13 +162,12 @@ if picture == 1
     figure
     plot(taxis,ne_all,'LineWidth',2)
     title(['E0 = ', num2str(max(Ex))])
-    xlabel('time (s)')
+    xlabel('time (ps)')
     ylabel('number of electrons')
     set(gca,'FontSize',20);
 
     figure
-    %taxis = taxis(end:-1:1); % reverse t axis to show evolution of ionizationt
-    taxis = taxis*1e12;
+    %taxis = taxis(end:-1:1); % reverse t axis to show evolution of ionization
     plot(taxis,Ion(1,:), taxis,Ion(2,:), taxis,Ion(3,:), taxis,Ion(4,:), taxis,Ion(5,:),taxis,Ion(6,:), taxis,Ion(7,:),taxis,Ion(8,:), taxis,Ion(9,:), taxis,Ion(10,:), taxis,Ion(11,:), taxis,Ion(12,:), taxis,Ion(13,:), taxis,Ion(14,:), taxis,Ion(15,:), taxis,Ion(16,:) ,taxis,Ion(17,:), 'LineWidth',2)
     hold on
     plot(taxis, Ex./max(Ex),'LineStyle',':','Color','black')
@@ -233,7 +231,7 @@ l_all = [0, 1, 1, 0, 1, 1, 0, 0, 0, 2, 3, 3, 2, 0, 2, 3, 3, 2];
 Ion = zeros(length(energyIon)+1,1);
 Ion(1) = 1;     % initialize with neutral atom
 p = 0;          % lowest ion level of the Reduced ODE, neutral 0
-LowDel = 1e-5;  % lower threashold approximating fully ionized number density
+LowDel = 1e-6;  % lower threashold approximating fully ionized number density
 newIon = zeros(4,1);
 W = zeros(length(energyIon),1);
 
@@ -319,7 +317,7 @@ end
 
 Ion_final = Ion;
 ne_final = ne_all(end);
-
+taxis = taxis*1e12;
 %% plot result
 
 if picture == 1
@@ -330,13 +328,12 @@ if picture == 1
     figure
     plot(taxis,ne_all,'LineWidth',2)
     title(['E0 = ', num2str(max(Ex))])
-    xlabel('time (s)')
+    xlabel('time (ps)')
     ylabel('number of electrons')
     set(gca,'FontSize',20);
 
     figure
-    %taxis = taxis(end:-1:1); % reverse t axis to show evolution of ionizationt
-    taxis = taxis*1e12;
+    %taxis = taxis(end:-1:1); % reverse t axis to show evolution of ionization   
     plot(taxis,Ion(1,:), taxis,Ion(2,:), taxis,Ion(3,:), taxis,Ion(4,:), taxis,Ion(5,:),taxis,Ion(6,:), taxis,Ion(7,:),taxis,Ion(8,:), taxis,Ion(9,:), taxis,Ion(10,:), taxis,Ion(11,:), taxis,Ion(12,:), taxis,Ion(13,:), taxis,Ion(14,:), taxis,Ion(15,:), taxis,Ion(16,:) ,taxis,Ion(17,:), 'LineWidth',2)
     hold on
     plot(taxis, Ex./max(Ex),'LineStyle',':','Color','black')
