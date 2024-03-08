@@ -12,12 +12,19 @@ clear clc
 % and the laser parameters in gaussian()
 
 % Example: Kr at focal location of CO2 laser 
-% full ODE solution
+% % using full ODE solution
 [Kr_fullODE,ne_fullODE,taxis] = ionAtLocation(0.1e-10,0e-6,1,0);
-
-% reduced 4 level ODE solution
-[Kr_reduce4ODE,ne_reduce4ODE,taxis] = ionAtLocation_4level(0.1e-10,0e-6,0,0);
-
+% % save output data
+csvwrite('Kr_fullODE.csv', Kr_fullODE) % ion evolution
+csvwrite('ne_fullODE.csv', ne_fullODE) % number of electrons evolution
+csvwrite('t_axis.csv', taxis)  % time axis for the evolution
+ 
+% % using reduced 4 level ODE solution
+[Kr_reduce4ODE,ne_reduce4ODE, taxis] = ionAtLocation_4level(0.1e-10,0e-6,0,0);
+% % save output data
+csvwrite('Kr_reduce4ODE.csv',Kr_reduce4ODE) % ion evolution
+csvwrite('ne_reduce4ODE.csv',ne_reduce4ODE) % number of electrons evolution
+% csvwrite('t_axis.csv', taxis)  % time axis for the evolution (same as fullODE)
 
 function [Ion_all, ne_all, taxis] = ionAtLocation(zf,r, picture, peakIntensity)
 % obtain ionization states of krypton for prescribed locations.
@@ -29,7 +36,7 @@ function [Ion_all, ne_all, taxis] = ionAtLocation(zf,r, picture, peakIntensity)
 % Outputs:
 % % Ion_all: (%) Evolution of number densities for all ion 
 % % ne_all: (per one neutral atom) Evolution of total number of electrons
-% % taxis: (s) computational time steps
+% % taxis: (ps) computational time steps
 
 % constants
 ep0 = 8.8542e-12; % (F/m) vacuume permitivoty
@@ -175,6 +182,7 @@ if picture == 1
 end
 
 end
+
 function [Ion_all, ne_all, taxis] = ionAtLocation_4level(zf,r, picture, peakIntensity)
 % obtain ionization states for prescribed locations
 % using the reduced 4 level ODE system
@@ -186,7 +194,7 @@ function [Ion_all, ne_all, taxis] = ionAtLocation_4level(zf,r, picture, peakInte
 % Outputs:
 % % Ion_all: (%) Evolution of number densities for all ion 
 % % ne_all: Evolution of total number of electrons
-% % taxis: (s) computational time steps
+% % taxis: (ps) computational time steps
 
 % constants
 ep0 = 8.8542e-12; % (F/m) vacuume permitivoty
