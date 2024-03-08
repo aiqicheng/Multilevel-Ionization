@@ -1,21 +1,25 @@
 clear clc
-% This scripts contains function used to plot figure 1 of the manuscript.
-% Algorithm to solve the multilevel ionization system (both full ODE and 
-% reduced 4 level ODE) are included.
-% The functions below used krypton with 4J 2ps laser as an exmple. 
-% Solutions for other gas medium or laser parameters can also be obtianed
-% by simply modifying line 44~57(or197~212) and line 370~374.
 
+% This script contains functions for computing multilevel ionization
+% evolution of high atomic number gas due to interation with high intenstity
+% laser.  
+% It includes algorithms for solving the complete multilevel ODE system 
+% as well as an analytical solution using reduced 4-level ODEs.
 
-% Example: 
+% The functions below use krypton with 4J 2ps laser as an exmple. 
+% Solutions for other gas mediums or laser parameters can also be obtianed
+% by simply modifying the "ionized medium" in ionAtLocation() or onAtLocation_4level() 
+% and the laser parameters in gaussian()
+
+% Example: Kr at focal location of CO2 laser 
 % full ODE solution
-ionAtLocation(0.1e-10,0e-6,1,0);
+[Kr_fullODE,ne_fullODE,taxis] = ionAtLocation(0.1e-10,0e-6,1,0);
 
 % reduced 4 level ODE solution
-ionAtLocation_4level(0.1e-10,0e-6,0,0);
+[Kr_reduce4ODE,ne_reduce4ODE,taxis] = ionAtLocation_4level(0.1e-10,0e-6,0,0);
 
 
-function [Ion_final, ne_final] = ionAtLocation(zf,r, picture, peakIntensity)
+function [Ion_all, ne_all, taxis] = ionAtLocation(zf,r, picture, peakIntensity)
 % obtain ionization states of krypton for prescribed locations.
 % Inputs:
 % % zf: (m) longitudinal distance from focus position
@@ -23,8 +27,9 @@ function [Ion_final, ne_final] = ionAtLocation(zf,r, picture, peakIntensity)
 % % picture: = 1 for plotting; ~= 1 to turn off plotting
 % % peakIntensity: (W/m^2) = 0 for default CO2 laser
 % Outputs:
-% % Ion_final: final number densities for all ion
-% % ne_final: final total number of electrons
+% % Ion_all: (%) Evolution of number densities for all ion 
+% % ne_all: (per one neutral atom) Evolution of total number of electrons
+% % taxis: (s) computational time steps
 
 % constants
 ep0 = 8.8542e-12; % (F/m) vacuume permitivoty
@@ -41,16 +46,18 @@ rsq = (r)^2; % (m^2) radial distance from center ^2
 [taxis, Ex] = gaussian(zf, rsq, peakIntensity);
 dt = taxis(2)-taxis(1);     % (s) timestep of computation
 
-% Ar ionization energy
-% Znum = 18;
-% energyIon = [15.75962, 27.62967, 40.74, 59.58, 74.84, 91.29, 124.41, 143.457, 422.60, 479.76, 540.4, 619.0, 685.5, 755.13, 855.5, 918.375, 4120.666, 4426.224]; %(eV)
-% l_all = [0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0];
+% Ionizated medium
 
-% Xe ionization energy
-% Znum = 56;
-% energyIon = [12.1298, 20.975, 31.05]; %(eV) higher levels omitted
-% l_all = [0, 1, 1];
-
+% % Ar ionization energy
+% % Znum = 18;
+% % energyIon = [15.75962, 27.62967, 40.74, 59.58, 74.84, 91.29, 124.41, 143.457, 422.60, 479.76, 540.4, 619.0, 685.5, 755.13, 855.5, 918.375, 4120.666, 4426.224]; %(eV)
+% % l_all = [0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0];
+% 
+% % Xe ionization energy
+% % Znum = 56;
+% % energyIon = [12.1298, 20.975, 31.05]; %(eV) higher levels omitted
+% % l_all = [0, 1, 1];
+% 
 % Kr ionization energy
 Znum = 36;
 energyIon = [13.9996055, 24.35984, 35.838, 50.85, 64.69, 78.49, 109.13, 125.082, 233, 268, 308, 350, 391, 446, 492, 540, 591, 640]; % (eV) higher levels omitted
@@ -109,7 +116,7 @@ for n=1:length(taxis)
         W_all = [W_all,W];
         
         %                         %%%% ionization solution
-        %             % --- based on analytical solution of full differential equation systems ---
+        %             % --- based on solution of full differential equation systems ---
 
         Wmatrix = ConstructMatrix(W);
         [Wvec, Wi] = eig(Wmatrix);  % Wvec : eigenvector V from the W matrix
@@ -168,7 +175,7 @@ if picture == 1
 end
 
 end
-function [Ion_final, ne_final] = ionAtLocation_4level(zf,r, picture, peakIntensity)
+function [Ion_all, ne_all, taxis] = ionAtLocation_4level(zf,r, picture, peakIntensity)
 % obtain ionization states for prescribed locations
 % using the reduced 4 level ODE system
 % Inputs:
@@ -177,8 +184,9 @@ function [Ion_final, ne_final] = ionAtLocation_4level(zf,r, picture, peakIntensi
 % % picture: = 1 for plotting; ~= 1 to turn off plotting
 % % peakIntensity: (W/m^2) = 0 for default CO2 laser
 % Outputs:
-% % Ion_final: final number densities for all ion
-% % ne_final: final total number of electrons
+% % Ion_all: (%) Evolution of number densities for all ion 
+% % ne_all: Evolution of total number of electrons
+% % taxis: (s) computational time steps
 
 % constants
 ep0 = 8.8542e-12; % (F/m) vacuume permitivoty
